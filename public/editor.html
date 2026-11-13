@@ -1,0 +1,1282 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Estúdio de Crachás</title>
+<link rel="icon" href="static/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Montserrat:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,700;1,400&family=Open+Sans:ital,wght@0,400;0,700;1,400&family=Oswald:wght@400;700&family=Bebas+Neue&family=Luckiest+Guy&family=Josefin+Sans:wght@700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap">
+<script src="static/vendor/qrcode.js"></script>
+<script src="static/vendor/JsBarcode.all.min.js"></script>
+<script src="static/vendor/jspdf.umd.min.js"></script>
+<script>window.BOOT="__BOOT__";</script>
+<style>
+/* Layout: ferramentas | palco com o cartão | painel de propriedades — estilo bancada de produção gráfica */
+:root{
+  --bg:#eceff2; --surface:#ffffff; --surface-2:#f5f7f9; --line:#d6dce2; --fg:#16202a; --muted:#5a6876;
+  --accent:#1d6b58; --accent-ink:#ffffff; --accent-soft:#dbeee8; --danger:#b3261e; --stage:#d9dfe5; --guide:#d6336c;
+  --f-display:"Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+  --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151a; --surface:#182029; --surface-2:#1e2731; --line:#2b3642; --fg:#e5ebf0; --muted:#94a2af;
+  --accent:#4cb596; --accent-ink:#05241b; --accent-soft:#163b31; --danger:#ff8a80; --stage:#0b0f13; --guide:#ff6b9a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151a; --surface:#182029; --surface-2:#1e2731; --line:#2b3642; --fg:#e5ebf0; --muted:#94a2af;
+  --accent:#4cb596; --accent-ink:#05241b; --accent-soft:#163b31; --danger:#ff8a80; --stage:#0b0f13; --guide:#ff6b9a; color-scheme:dark}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-size:14px}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand strong{font-family:var(--f-display);font-size:19px;letter-spacing:-.01em}
+.spec{font-family:var(--f-mono);font-size:11px;color:var(--muted);border:1px solid var(--line);padding:2px 6px;border-radius:4px;white-space:nowrap}
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px}
+.tabs button{border:0;background:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:600;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.hist{margin-left:auto;display:flex;gap:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:7px;cursor:pointer;font-weight:600;font-size:13px;white-space:nowrap}
+.btn:hover:not(:disabled){border-color:var(--muted)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.sm{padding:4px 8px;font-size:12px}
+.btn.danger{color:var(--danger)}
+main{padding-block:18px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.design{display:grid;grid-template-columns:84px minmax(0,1fr) 320px;gap:16px;align-items:start}
+.tools{display:flex;flex-direction:column;gap:6px;position:sticky;top:12px}
+.tool{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border:1px solid var(--line);background:var(--surface);border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;color:var(--muted);text-align:center;line-height:1.15}
+.tool svg{width:22px;height:22px;color:var(--fg)}
+.tool:hover{border-color:var(--accent);color:var(--fg)}
+.stage-wrap{min-width:0;display:flex;flex-direction:column;gap:10px}
+.stagebar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-weight:600;font-size:13px;color:var(--muted)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--fg)}
+.recnav{display:flex;align-items:center;gap:6px;margin-left:auto;min-width:0}
+.recnav select{max-width:230px;min-width:0}
+select,input[type=text],input[type=number],textarea{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:0}
+textarea{width:100%;resize:vertical;min-height:58px;font-family:var(--f-mono);font-size:12px}
+.stage{background:var(--stage);border-radius:12px;padding:28px 16px;display:flex;justify-content:center;align-items:center;min-height:320px;background-image:radial-gradient(circle,color-mix(in srgb,var(--muted) 22%,transparent) 1px,transparent 1.2px);background-size:14px 14px}
+#cv{touch-action:none;border-radius:10px;box-shadow:0 1px 2px rgba(0,0,0,.18),0 10px 30px rgba(0,0,0,.18);cursor:default;max-width:100%}
+.ruler{font-family:var(--f-mono);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:14px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+.panel h3{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ph strong{font-family:var(--f-display);font-size:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.f{display:flex;flex-direction:column;gap:3px;min-width:0}
+.f span{font-size:11px;color:var(--muted);font-weight:600}
+.f input[type=number]{font-family:var(--f-mono);font-size:12px;width:100%}
+.f input[type=color]{width:100%;height:32px;padding:2px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.f select{width:100%}
+.c{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{border:1px dashed var(--accent);background:var(--accent-soft);color:var(--fg);border-radius:999px;padding:2px 8px;font-family:var(--f-mono);font-size:11px;cursor:pointer}
+.sect{display:flex;flex-direction:column;gap:8px;padding-top:12px;border-top:1px solid var(--line)}
+.layers{display:flex;flex-direction:column;gap:2px}
+.layers button{display:flex;gap:8px;align-items:center;text-align:left;border:1px solid transparent;background:none;padding:5px 6px;border-radius:6px;cursor:pointer;font-size:12px;min-width:0}
+.layers button:hover{background:var(--surface-2)}
+.layers button[aria-current="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.layers .t{font-family:var(--f-mono);font-size:10px;color:var(--muted);text-transform:uppercase;width:58px;flex:none}
+.layers .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.note{font-size:12px;color:var(--muted);margin:0}
+.thumb{width:100%;height:70px;border:1px solid var(--line);border-radius:6px;background:var(--surface-2) center/cover no-repeat}
+/* Dados */
+.sheet-head{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.sheet-head h2,.exp h2{font-family:var(--f-display);font-size:24px;margin:0 0 2px;text-wrap:balance}
+.sheet-head p{margin:0;color:var(--muted);max-width:62ch}
+.fieldbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:12px}
+.fchip{display:inline-flex;align-items:center;gap:4px;font-family:var(--f-mono);font-size:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:3px 4px 3px 8px}
+.fchip button{border:0;background:none;cursor:pointer;color:var(--muted);padding:0 4px;font-size:14px;line-height:1}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface-2);font-family:var(--f-mono);font-weight:500;white-space:nowrap}
+td input{width:100%;min-width:110px;border-color:transparent;background:transparent}
+td input:hover,td input:focus{border-color:var(--line);background:var(--surface)}
+td.num{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;width:36px}
+.ph-btn{width:40px;height:52px;border-radius:5px;border:1px dashed var(--line);background:var(--surface-2) center/cover no-repeat;cursor:pointer;font-size:10px;color:var(--muted);padding:0}
+.tag{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:999px}
+/* Exportar */
+.exp{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h3{margin:0;font-family:var(--f-display);font-size:17px}
+.card p{margin:0;color:var(--muted);font-size:13px;max-width:60ch}
+.exp-head{grid-column:1/-1}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;opacity:0;pointer-events:none;transition:.2s;max-width:min(92vw,520px);text-align:center;z-index:20}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (max-width:1100px){.design{grid-template-columns:76px minmax(0,1fr)}.panel{grid-column:1/-1;position:static;max-height:none}}
+@media (max-width:640px){
+  .design{grid-template-columns:1fr}
+  .tools{flex-direction:row;flex-wrap:wrap;position:static}
+  .tool{flex:1 1 calc(25% - 6px);padding:8px 2px}
+  .hist{margin-left:0}
+  .recnav{margin-left:0;width:100%}
+  .recnav select{flex:1;max-width:none}
+  .stage{padding:16px 8px;min-height:200px}
+}
+/* barra de modelos, conta e salvamento */
+.tplbar{display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap}
+.tplbar select{max-width:220px;font-weight:600}
+.status{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.status[data-s="pending"]::before,.status[data-s="saving"]::before{background:#d4a017}
+.status[data-s="error"]{color:var(--danger)}
+.status[data-s="error"]::before{background:var(--danger)}
+.who{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.who form{margin:0}
+.users-wrap{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:16px;align-items:start}
+.pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);white-space:nowrap}
+.pill.on{background:var(--accent-soft);border-color:var(--accent);color:var(--fg)}
+.pill.off{color:var(--danger)}
+.form{display:flex;flex-direction:column;gap:10px}
+.form input,.form select{width:100%}
+.credit{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding-block:6px 18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:11px;color:var(--muted)}
+.credit img{height:15px;width:auto;opacity:.75}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .credit img{filter:brightness(0) invert(.8)}}
+:root[data-theme="dark"] .credit img{filter:brightness(0) invert(.8)}
+.loading{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:30;font-weight:600;color:var(--muted)}
+@media (max-width:900px){.users-wrap{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="loading" id="loading">Carregando seus modelos…</div>
+
+<header class="top">
+  <div class="brand">
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1.5" y="5" width="23" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4.5" y="8.5" width="6" height="8" rx="1" fill="var(--accent)"/><path d="M13 10h8M13 13h6M13 16h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    <strong>Estúdio de Crachás</strong>
+    <span class="spec" id="specTag">CR80 · 85,6 × 54 mm</span>
+  </div>
+  <div class="tplbar" aria-label="Modelos">
+    <select id="tplSel" aria-label="Modelo de crachá"></select>
+    <button class="btn sm" id="tplNew" title="Criar um modelo novo">+ Novo</button>
+    <button class="btn sm" id="tplDup" title="Duplicar este modelo">Duplicar</button>
+    <button class="btn sm" id="tplRename">Renomear</button>
+    <button class="btn sm danger" id="tplDel">Excluir</button>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Seções">
+    <button role="tab" id="tab-design" data-view="design" aria-selected="true">Design</button>
+    <button role="tab" id="tab-dados" data-view="dados" aria-selected="false">Alunos</button>
+    <button role="tab" id="tab-exportar" data-view="exportar" aria-selected="false">Imprimir e exportar</button>
+    <button role="tab" id="tab-conta" data-view="conta" aria-selected="false">Minha conta</button>
+  </nav>
+  <div class="hist">
+    <button class="btn sm" id="undo" title="Desfazer (Ctrl+Z)">↶ Desfazer</button>
+    <button class="btn sm" id="redo" title="Refazer (Ctrl+Shift+Z)">↷ Refazer</button>
+    <span class="status" id="saveState" data-s="saved" role="status" aria-live="polite">Salvo</span>
+  </div>
+  <div class="who"><span id="whoName"></span><form method="post" id="logoutForm"><button class="btn sm" type="submit">Sair</button></form></div>
+</header>
+
+<main>
+  <section id="view-design" class="design">
+    <aside class="tools" aria-label="Adicionar elementos">
+      <button class="tool" id="add-text" data-add="text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 6h14M12 6v13M9 19h6"/></svg>Texto</button>
+      <button class="tool" id="add-field" data-add="field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 5c-2 0-2 1.5-2 3s0 3-2 4c2 1 2 2.5 2 4s0 3 2 3M16 5c2 0 2 1.5 2 3s0 3 2 4c-2 1-2 2.5-2 4s0 3-2 3"/></svg>Campo</button>
+      <button class="tool" id="add-photo" data-add="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7.5 18c1-2.5 2.6-3.5 4.5-3.5s3.5 1 4.5 3.5"/></svg>Foto</button>
+      <button class="tool" id="add-image" data-add="image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/></svg>Logo / imagem</button>
+      <button class="tool" id="add-qr" data-add="qr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3zM18 14h3M14 18v3"/></svg>QR Code</button>
+      <button class="tool" id="add-barcode" data-add="barcode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M16 5v14M20 5v14"/></svg>Código de barras</button>
+      <button class="tool" id="add-rect" data-add="rect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="6" width="16" height="12" rx="2"/></svg>Forma</button>
+    </aside>
+
+    <div class="stage-wrap">
+      <div class="stagebar">
+        <div class="seg" role="group" aria-label="Lado do cartão">
+          <button id="side-front" data-side="front" aria-pressed="true">Frente</button>
+          <button id="side-back" data-side="back" aria-pressed="false">Verso</button>
+        </div>
+        <div class="seg" role="group" aria-label="Orientação">
+          <button id="or-land" data-or="landscape" aria-pressed="true">Horizontal</button>
+          <button id="or-port" data-or="portrait" aria-pressed="false">Vertical</button>
+        </div>
+        <div class="recnav">
+          <button class="btn sm" id="recPrev" aria-label="Aluno anterior">◀</button>
+          <select id="recSel" aria-label="Pré-visualizar com"></select>
+          <button class="btn sm" id="recNext" aria-label="Próximo aluno">▶</button>
+        </div>
+      </div>
+      <div class="stage" id="stage"><canvas id="cv" width="600" height="380" aria-label="Área de edição do cartão"></canvas></div>
+      <div class="ruler"><span id="cursorPos">x — · y — mm</span><span>Arraste para mover · alça no canto redimensiona · setas ajustam 0,5 mm · Delete remove · Ctrl+D duplica</span></div>
+    </div>
+
+    <aside class="panel" id="panel" aria-label="Propriedades"></aside>
+  </section>
+
+  <section id="view-dados" hidden>
+    <div class="sheet-head">
+      <div>
+        <h2>Alunos</h2>
+        <p>Cada linha vira um cartão. Os campos aparecem no design como <code>{nome}</code>, <code>{matricula}</code> e assim por diante. A lista é a mesma para todos os modelos e fica salva no servidor: todos que entram no sistema veem os mesmos alunos.</p>
+      </div>
+      <div class="row">
+        <button class="btn pri" id="addRec">+ Adicionar aluno</button>
+        <select id="csvMode" aria-label="Modo de importação"><option value="replace">Substituir lista</option><option value="append">Adicionar à lista</option></select>
+        <button class="btn" id="impCsv">Importar planilha (CSV)</button>
+        <button class="btn" id="impPhotos" title="O nome de cada arquivo deve ser a matrícula ou o nome do aluno">Importar fotos em lote</button>
+        <button class="btn danger" id="clearRecs">Remover todos</button>
+      </div>
+    </div>
+    <div class="fieldbar" id="fieldbar"></div>
+    <div class="table-wrap"><table id="tbl"></table></div>
+    <p class="note" style="margin-top:10px">Fotos em lote: nomeie os arquivos com a matrícula (ex.: <code>2026.0314.jpg</code>) ou com o nome do aluno. Planilhas do Excel: salve como “CSV (separado por ponto e vírgula)”.</p>
+  </section>
+
+  <section id="view-exportar" hidden>
+    <div class="exp">
+      <div class="exp-head">
+        <h2>Imprimir e exportar</h2>
+        <p class="note">Gere imagens do cartão atual, PDFs em lote para impressora de cartão PVC ou folhas A4 com marcas de corte, e faça cópia de segurança do modelo em arquivo.</p>
+      </div>
+      <div class="card">
+        <h3>Cartão atual</h3>
+        <p id="curName">—</p>
+        <label class="f"><span>Resolução</span>
+          <select id="dpi"><option value="300" selected>300 dpi (impressoras de cartão)</option><option value="600">600 dpi (alta qualidade)</option></select>
+        </label>
+        <div class="row">
+          <button class="btn pri" id="pngFront">Baixar frente (PNG)</button>
+          <button class="btn" id="pngBack">Baixar verso (PNG)</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Lote em PDF</h3>
+        <p>Um arquivo com todos os alunos. Imprima em 100% (tamanho real), sem “ajustar à página”.</p>
+        <label class="f"><span>Formato</span>
+          <select id="pdfLayout">
+            <option value="card">Impressora de cartão PVC (1 cartão por página, CR80)</option>
+            <option value="a4">Folha A4 com marcas de corte</option>
+          </select>
+        </label>
+        <label class="f"><span>Quais alunos</span>
+          <select id="pdfRange"><option value="all">Todos</option><option value="cur">Somente o aluno atual</option></select>
+        </label>
+        <label class="c"><input type="checkbox" id="pdfBack" checked> Incluir verso (frente e verso)</label>
+        <p class="note" id="a4Info"></p>
+        <button class="btn pri" id="pdfGo">Gerar PDF</button>
+      </div>
+      <div class="card">
+        <h3>Modelo</h3>
+        <p>Tudo já fica salvo no servidor. Use o arquivo como cópia de segurança ou para trazer um modelo de fora. Abrir um arquivo cria um modelo novo.</p>
+        <label class="c"><input type="checkbox" id="incData"> Incluir alunos e fotos no arquivo</label>
+        <div class="row">
+          <button class="btn pri" id="saveTpl">Baixar cópia do modelo (.json)</button>
+          <button class="btn" id="openTpl">Abrir arquivo de modelo</button>
+        </div>
+        <div class="row">
+          <button class="btn" id="csvModel">Baixar planilha modelo (CSV)</button>
+          <button class="btn danger" id="resetAll">Restaurar layout de exemplo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-conta" hidden>
+    <div class="sheet-head"><div><h2 id="contaTitle">Minha conta</h2><p id="contaSub">Troque sua senha de acesso.</p></div></div>
+    <div class="users-wrap">
+      <div id="usersBox" hidden>
+        <div class="table-wrap"><table id="usersTbl" style="min-width:640px"></table></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <form class="card form" id="newUserForm" hidden>
+          <h3>Novo usuário</h3>
+          <label class="f"><span>Nome</span><input type="text" id="nuName" required maxlength="80"></label>
+          <label class="f"><span>E-mail (login)</span><input type="text" id="nuEmail" inputmode="email" autocomplete="off" required></label>
+          <label class="f"><span>Senha inicial (mín. 8 caracteres)</span><input type="text" id="nuPass" autocomplete="off" required minlength="8"></label>
+          <label class="f"><span>Perfil</span><select id="nuRole"><option value="user">Usuário: cria e imprime crachás</option><option value="admin">Administrador: também gerencia usuários</option></select></label>
+          <button class="btn pri" type="submit">Criar usuário</button>
+        </form>
+        <form class="card form" id="pwForm">
+          <h3>Trocar minha senha</h3>
+          <label class="f"><span>Senha atual</span><input type="password" id="pwCur" autocomplete="current-password" required></label>
+          <label class="f"><span>Nova senha (mín. 8 caracteres)</span><input type="password" id="pwNew" autocomplete="new-password" required minlength="8"></label>
+          <button class="btn pri" type="submit">Salvar nova senha</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="credit">Desenvolvido por <img src="static/img/apoena-dev.png" alt="Apoena Dev" width="73" height="15"></footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="fileImg" accept="image/*" hidden>
+<input type="file" id="fileBg" accept="image/*" hidden>
+<input type="file" id="filePhoto" accept="image/*" hidden>
+<input type="file" id="filePhotos" accept="image/*" multiple hidden>
+<input type="file" id="fileCsv" accept=".csv,text/csv,.txt" hidden>
+<input type="file" id="fileTpl" accept=".json,application/json" hidden>
+
+<script>
+(() => {
+"use strict";
+const PT = 0.3528; // 1 pt em mm
+const FONTS = ["Montserrat","Roboto","Poppins","Open Sans","Oswald","Bebas Neue","Luckiest Guy","Josefin Sans","Playfair Display"];
+const BOOT = (typeof window.BOOT==="object" && window.BOOT) || {base:"",user:null};
+const BASE = BOOT.base || "";
+const DEFAULT_FIELDS = ["nome","serie","turma","turno","responsavel","validade","matricula"];
+const TYPE_LABEL = {text:"Texto",rect:"Forma",photo:"Foto",image:"Imagem",qr:"QR Code",barcode:"Barras"};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = (p="e") => p + Math.random().toString(36).slice(2,9);
+const rid = (p) => { const a=new Uint8Array(10); crypto.getRandomValues(a); return p+[...a].map(b=>b.toString(16).padStart(2,"0")).join(""); };
+const r2 = v => Math.round(v*100)/100;
+
+if (window.qrcode && qrcode.stringToBytesFuncs && qrcode.stringToBytesFuncs["UTF-8"]) qrcode.stringToBytes = qrcode.stringToBytesFuncs["UTF-8"];
+
+/* ---------- modelo padrão ---------- */
+function T(x,y,w,h,text,o={}){return {id:uid(),type:"text",x,y,w,h,text,font:"Montserrat",size:7,color:"#17212b",bold:false,italic:false,upper:false,align:"left",valign:"top",fit:false,ls:0,lh:1.15,...o}}
+function R(x,y,w,h,o={}){return {id:uid(),type:"rect",x,y,w,h,fill:"#0f3d5e",radius:0,opacity:1,stroke:"#000000",strokeW:0,...o}}
+const NAVY="#2b3990", INK="#2e2e2e";
+const LBL = {font:"Roboto",size:5.6,bold:true,italic:true,upper:true,color:INK};
+const VAL = {font:"Roboto",size:8.6,bold:true,italic:true,upper:true,color:INK,valign:"middle",fit:true};
+function box(x,y,w,h){ return R(x,y,w,h,{fill:"#ffffff",stroke:INK,strokeW:0.2}); }
+function makeDemoBg(){
+  // fundo de demonstração (ondas amarelas); troque pela arte da escola no painel "Fundo"
+  const c=document.createElement("canvas"); c.width=1018; c.height=640; const g=c.getContext("2d");
+  g.fillStyle="#f3f3f4"; g.fillRect(0,0,1018,640);
+  g.strokeStyle="rgba(120,120,130,.22)"; g.lineWidth=1.2;
+  for(let i=0;i<26;i++){ g.beginPath(); g.moveTo(560,640-i*6); g.bezierCurveTo(700,520-i*7,820,640-i*4,1018,470-i*7); g.stroke(); }
+  for(let i=0;i<18;i++){ g.beginPath(); g.moveTo(220+i*8,0); g.bezierCurveTo(330+i*6,90,420,30+i*4,600+i*5,0); g.stroke(); }
+  const band=(pts,col)=>{ g.fillStyle=col; g.beginPath(); g.moveTo(...pts[0]); for(let i=1;i<pts.length;i+=3) g.bezierCurveTo(...pts[i],...pts[i+1],...pts[i+2]); g.closePath(); g.fill(); };
+  band([[0,40],[120,-10],[230,120],[330,40],[420,-20],[520,30],[600,0],[600,0],[0,0],[0,0]],"#f9b51c");
+  band([[0,60],[140,20],[230,150],[330,70],[230,135],[120,40],[0,90]],"#fcd24a");
+  band([[620,640],[760,560],[860,650],[1018,500],[1018,560],[1018,600],[1018,640]],"#f9b51c");
+  band([[700,640],[820,590],[900,660],[1018,560],[1018,600],[1018,620],[1018,640]],"#fcd24a");
+  g.fillStyle="#2e2e2e"; [[18,46],[34,46],[50,46],[330,140],[346,140],[362,140],[378,140],[28,625],[44,625],[980,90],[982,520]].forEach(([x,y])=>{g.beginPath();g.arc(x,y,2.4,0,7);g.fill();});
+  g.fillStyle="#f5a623"; [[980,185],[980,205],[980,225],[980,245],[830,10],[830,20]].forEach(([x,y])=>{g.beginPath();g.arc(x,y,2.6,0,7);g.fill();});
+  return c.toDataURL("image/jpeg",0.9);
+}
+function defaultState(){
+  let bgId=null; try{ bgId=registerAsset(makeDemoBg()); }catch(e){}
+  return {
+    version:2, orientation:"landscape",
+    fields:["nome","serie","turma","turno","responsavel","validade","matricula"],
+
+    sides:{
+      front:{bg:{color:"#f3f3f4",image:bgId,fit:"cover"},els:[
+        {id:uid(),type:"image",x:36,y:2,w:18.4,h:10.6,asset:null,fit:"contain",opacity:1,label:"Logo da escola"},
+        {id:uid(),type:"image",x:54.6,y:4.6,w:18.2,h:7.2,asset:null,fit:"contain",opacity:1,label:"Logo do sistema"},
+        {id:uid(),type:"photo",x:3.1,y:10.3,w:21.2,h:26.6,radius:1.8,circle:false,stroke:INK,strokeW:0.25},
+        T(2.4,38.4,22.8,15,"Estudante\nValidade:\n{validade}",{font:"Luckiest Guy",size:16,color:"#fcc419",stroke:NAVY,strokeW:0.3,align:"center",upper:true,fit:true,lh:1.02}),
+        T(24.5,13.1,59,2.6,"Resolução N.º 197/2013",{font:"Roboto",size:6.6,color:"#3a3a3a",align:"center",upper:true}),
+        T(24.5,16.1,59,2.6,"Rua Santa Etelvina, 301  Santa Etelvina",{font:"Roboto",size:6.6,color:"#3a3a3a",align:"center",upper:true,fit:true}),
+        T(24.5,19.0,59,2.4,"Fone: 92 99328-1452   CNPJ: 08.726.055/0001-95",{font:"Roboto",size:5.6,color:"#3a3a3a",align:"center",upper:true,fit:true}),
+        T(24.5,21.5,59,3.6,"Identidade Estudantil",{font:"Josefin Sans",size:10,bold:true,color:"#3a3a3a",align:"center",upper:true,ls:0.12}),
+        T(27.1,25.7,30,2.4,"Nome:",LBL),
+        box(26.5,28.4,56,5.3), T(27.5,28.4,54,5.3,"{nome}",VAL),
+        T(27.1,34.4,18,2.4,"Série:",LBL), T(47.6,34.4,9,2.4,"Turma:",LBL), T(57.4,34.4,20,2.4,"Turno:",LBL),
+        box(26.5,37,19.6,5.3), T(27.5,37,17.6,5.3,"{serie}",VAL),
+        box(46.9,37,8.8,5.3), T(47.2,37,8.2,5.3,"{turma}",{...VAL,align:"center"}),
+        box(56.8,37,25.7,5.3), T(57.8,37,23.7,5.3,"{turno}",VAL),
+        T(27.1,43.6,40,2.4,"Responsável:",LBL),
+        box(26.5,46.2,56,5.3), T(27.5,46.2,54,5.3,"{responsavel}",VAL)
+      ]},
+      back:{bg:{color:"#ffffff",image:null,fit:"cover"},els:[
+        R(0,0,85.6,4,{fill:"#f9b51c"}),
+        T(4,7.5,48,3.4,"Centro Educacional Doce Começo",{font:"Josefin Sans",size:7.4,bold:true,color:NAVY,upper:true,fit:true}),
+        T(4,11.6,48,3,"Uso pessoal e intransferível",{font:"Roboto",size:5.6,bold:true,color:INK,upper:true,ls:0.06}),
+        T(4,15.2,48,14,"Este cartão identifica o(a) estudante e libera a entrada e a saída na catraca. Em caso de perda, comunique a secretaria. Somente o responsável cadastrado pode retirar o(a) aluno(a).",{font:"Roboto",size:5.4,color:"#3a3a3a",lh:1.3}),
+        T(4,31.5,48,3,"Responsável: {responsavel}",{font:"Roboto",size:5.4,bold:true,color:INK,upper:true,fit:true}),
+        {id:uid(),type:"barcode",x:4,y:36,w:48,h:7.5,text:"{matricula}",color:"#111111"},
+        T(4,44.2,48,2.8,"Matrícula {matricula}",{font:"Roboto",size:5.2,align:"center",ls:0.2,color:INK}),
+        {id:uid(),type:"qr",x:56.5,y:8,w:25,h:25,text:"{matricula}",color:NAVY,bg:"#ffffff",ecc:"M",quiet:1},
+        T(56.5,34,25,3,"Acesso à catraca",{font:"Roboto",size:5,align:"center",color:"#6b7a88",upper:true,ls:0.08,bold:true}),
+        R(0,50,85.6,4,{fill:NAVY})
+      ]}
+    },
+    records:[]
+  };
+}
+
+/* ---------- estado ---------- */
+/* ---------- servidor ---------- */
+async function api(method, path, body){
+  const opt={method, headers:{"Accept":"application/json"}, credentials:"same-origin"};
+  if(body!==undefined){ opt.headers["Content-Type"]="application/json"; opt.body=JSON.stringify(body); }
+  let r;
+  try{ r=await fetch(BASE+"/api"+path, opt); }catch(e){ throw new Error("Sem conexão com o servidor."); }
+  if(r.status===401){ location.href=BASE+"/login"; throw new Error("Sessão expirada."); }
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(d.error||("Erro "+r.status));
+  return d;
+}
+const localAssets={};           // imagens recém-enviadas, exibidas antes de o servidor responder
+const pendingUploads=[];
+function dataUrlToBlob(u){ const [h,b64]=u.split(","); const mime=(h.match(/data:([^;]+)/)||[])[1]||"image/png"; const bin=atob(b64); const a=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return new Blob([a],{type:mime}); }
+async function uploadAsset(id, dataUrl){
+  const blob=dataUrlToBlob(dataUrl);
+  const r=await fetch(BASE+"/api/assets?id="+encodeURIComponent(id),{method:"POST",headers:{"Content-Type":blob.type},body:blob,credentials:"same-origin"});
+  if(r.status===401){ location.href=BASE+"/login"; return; }
+  if(!r.ok){ const d=await r.json().catch(()=>({})); throw new Error(d.error||"Falha ao enviar imagem."); }
+}
+function registerAsset(dataUrl, id){
+  id = id || rid("a");
+  localAssets[id]=dataUrl;
+  const p=uploadAsset(id,dataUrl).catch(e=>{ toast("Não foi possível enviar uma imagem: "+e.message); throw e; });
+  pendingUploads.push(p); p.catch(()=>{});
+  return id;
+}
+const assetSrc = id => typeof id!=="string"||!id ? undefined : (localAssets[id] || (id.startsWith("data:")?id:BASE+"/api/assets/"+encodeURIComponent(id)));
+
+let state = {orientation:"landscape", fields:DEFAULT_FIELDS.slice(), sides:{front:{bg:{color:"#ffffff",image:null,fit:"cover"},els:[]},back:{bg:{color:"#ffffff",image:null,fit:"cover"},els:[]}}, records:[]};
+const ASSETS = new Proxy({}, {get:(_,k)=>assetSrc(k)});
+Object.defineProperty(state,"assets",{get:()=>ASSETS,enumerable:false,configurable:true});
+function setStateObj(o){ const keep={orientation:o.orientation||"landscape",fields:o.fields||state.fields,sides:o.sides,records:o.records||state.records}; state=keep; Object.defineProperty(state,"assets",{get:()=>ASSETS,enumerable:false,configurable:true}); }
+let templates=[], curTpl=null;
+const ui = {side:"front", sel:null, rec:-1, view:"design", guides:null, hover:null};
+const hist = {undo:[], redo:[]};
+const dims = () => state.orientation==="landscape" ? {W:85.6,H:54} : {W:54,H:85.6};
+const side = () => state.sides[ui.side];
+const selEl = () => side().els.find(e => e.id===ui.sel) || null;
+const curRec = () => ui.rec>=0 ? state.records[ui.rec] || null : null;
+
+/* salvamento: compara com o que o servidor já tem e envia só o que mudou */
+const layoutOf = () => ({version:2, orientation:state.orientation, sides:state.sides});
+const rowOf = (r,i) => { const data={}; for(const k of Object.keys(r)) if(k!=="_id"&&k!=="foto") data[k]=r[k]; return {id:r._id, data, foto:r.foto||null, position:i}; };
+const last = {tpl:null, fields:null, students:new Map()};
+function markSynced(){
+  last.tpl=JSON.stringify(layoutOf()); last.fields=JSON.stringify(state.fields);
+  last.students=new Map(state.records.map((r,i)=>{ const row=rowOf(r,i); return [row.id, JSON.stringify(row)]; }));
+}
+function setStatus(st, msg){ const el=$("#saveState"); el.dataset.s=st; el.textContent = msg || ({saved:"Salvo",pending:"Alterações não salvas",saving:"Salvando…",error:"Erro ao salvar"}[st]); }
+let saveT, flushing=false, again=false, retryT;
+function save(){ clearTimeout(saveT); setStatus("pending"); saveT=setTimeout(flush, 700); }
+async function flush(){
+  clearTimeout(saveT);
+  if(flushing){ again=true; return; }
+  flushing=true; setStatus("saving");
+  try{
+    while(pendingUploads.length) await Promise.allSettled(pendingUploads.splice(0));
+    const lay=JSON.stringify(layoutOf());
+    if(curTpl && lay!==last.tpl){ const r=await api("PUT","/templates/"+curTpl.id,{data:JSON.parse(lay)}); last.tpl=lay; curTpl.updated_at=r.updated_at; }
+    const f=JSON.stringify(state.fields);
+    if(f!==last.fields){ await api("PUT","/fields",{fields:state.fields}); last.fields=f; }
+    const up=[], seen=new Set();
+    state.records.forEach((r,i)=>{ if(!r._id) r._id=rid("r"); const row=rowOf(r,i), js=JSON.stringify(row); seen.add(row.id); if(last.students.get(row.id)!==js) up.push([row,js]); });
+    const del=[...last.students.keys()].filter(id=>!seen.has(id));
+    if(up.length||del.length){
+      for(let i=0;i<Math.max(up.length,1);i+=400){
+        const part=up.slice(i,i+400);
+        await api("POST","/students/sync",{upsert:part.map(x=>x[0]), delete:i===0?del:[]});
+        part.forEach(([row,js])=>last.students.set(row.id,js));
+        if(i===0) del.forEach(id=>last.students.delete(id));
+      }
+    }
+    setStatus("saved");
+  }catch(e){
+    setStatus("error","Erro ao salvar — tentando de novo");
+    clearTimeout(retryT); retryT=setTimeout(flush, 6000);
+    if(!flush._warned){ toast(e.message); flush._warned=true; setTimeout(()=>flush._warned=false,30000); }
+  }finally{
+    flushing=false;
+    if(again){ again=false; flush(); }
+  }
+}
+const unsaved = () => ["pending","saving","error"].includes($("#saveState").dataset.s);
+window.addEventListener("beforeunload", e => { if(unsaved()){ flush(); e.preventDefault(); e.returnValue=""; } });
+function usedAssets(){
+  const u = new Set();
+  for (const k of ["front","back"]) { const s=state.sides[k]; if (s.bg.image) u.add(s.bg.image); s.els.forEach(e => e.asset && u.add(e.asset)); }
+  state.records.forEach(r => r.foto && u.add(r.foto));
+  return u;
+}
+
+function snapshot(){ return JSON.stringify({o:state.orientation, s:state.sides, f:state.fields}); }
+function pushHist(){ hist.undo.push(snapshot()); if(hist.undo.length>60) hist.undo.shift(); hist.redo=[]; updHist(); }
+function restore(js){ const d=JSON.parse(js); state.orientation=d.o; state.sides=d.s; state.fields=d.f; if(!side().els.find(e=>e.id===ui.sel)) ui.sel=null; fullRefresh(); save(); }
+function undo(){ if(!hist.undo.length) return; hist.redo.push(snapshot()); restore(hist.undo.pop()); updHist(); }
+function redo(){ if(!hist.redo.length) return; hist.undo.push(snapshot()); restore(hist.redo.pop()); updHist(); }
+function updHist(){ $("#undo").disabled=!hist.undo.length; $("#redo").disabled=!hist.redo.length; }
+
+/* ---------- imagens ---------- */
+const imgCache = new Map();
+function getImg(id){
+  const src = state.assets[id]; if(!src) return null;
+  let c = imgCache.get(src);
+  if(!c){ const im=new Image(); c={im,ok:false}; im.onload=()=>{c.ok=true; draw();}; im.src=src; imgCache.set(src,c); }
+  return c.ok ? c.im : null;
+}
+function loadImg(id){
+  return new Promise(res => {
+    const src=state.assets[id]; if(!src) return res(null);
+    const c=imgCache.get(src); if(c&&c.ok) return res(c.im);
+    const im=new Image(); im.onload=()=>{imgCache.set(src,{im,ok:true}); res(im)}; im.onerror=()=>res(null); im.src=src;
+  });
+}
+function fileToAsset(file, max=1400){
+  return new Promise((res,rej) => {
+    const fr=new FileReader();
+    fr.onerror=()=>rej(new Error("Não foi possível ler o arquivo."));
+    fr.onload=()=>{
+      const im=new Image();
+      im.onerror=()=>rej(new Error("Arquivo de imagem inválido."));
+      im.onload=()=>{
+        const k=Math.min(1, max/Math.max(im.naturalWidth||max, im.naturalHeight||max));
+        const c=document.createElement("canvas"); c.width=Math.max(1,Math.round((im.naturalWidth||max)*k)); c.height=Math.max(1,Math.round((im.naturalHeight||max)*k));
+        c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+        const keepAlpha = /png|svg|gif|webp/.test(file.type);
+        const url = keepAlpha ? c.toDataURL("image/png") : c.toDataURL("image/jpeg",0.9);
+        const id=registerAsset(url); res({id,w:c.width,h:c.height});
+      };
+      im.src=fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+/* ---------- desenho ---------- */
+function fillTpl(t, rec){ return String(t ?? "").replace(/\{([\wÀ-ÿ]+)\}/g, (m,k) => rec ? (rec[k] ?? "") : m); }
+function rr(ctx,x,y,w,h,r){
+  r=Math.max(0,Math.min(r,w/2,h/2)); ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r); ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
+}
+function drawFit(ctx,im,x,y,w,h,fit,fy=0.5){
+  const iw=im.naturalWidth, ih=im.naturalHeight; if(!iw||!ih) return;
+  if(fit==="stretch") return ctx.drawImage(im,x,y,w,h);
+  if(fit==="contain"){ const k=Math.min(w/iw,h/ih), dw=iw*k, dh=ih*k; return ctx.drawImage(im,x+(w-dw)/2,y+(h-dh)/2,dw,dh); }
+  const k=Math.max(w/iw,h/ih), sw=w/k, sh=h/k;
+  ctx.drawImage(im,(iw-sw)/2,(ih-sh)*fy,sw,sh,x,y,w,h);
+}
+function wrapLines(ctx, txt, w){
+  const out=[];
+  for(const para of txt.split("\n")){
+    const words=para.split(/\s+/).filter(Boolean); if(!words.length){out.push(""); continue;}
+    let line=words[0];
+    for(let i=1;i<words.length;i++){ const t=line+" "+words[i]; if(ctx.measureText(t).width<=w) line=t; else { out.push(line); line=words[i]; } }
+    out.push(line);
+  }
+  return out;
+}
+const qrCache=new Map();
+function qrMatrix(text, ecc){
+  const k=ecc+"|"+text; if(qrCache.has(k)) return qrCache.get(k);
+  let m=null;
+  try{ const q=qrcode(0,ecc||"M"); q.addData(text); q.make(); const n=q.getModuleCount(); m={n,d:[]}; for(let r=0;r<n;r++){const row=[];for(let c=0;c<n;c++) row.push(q.isDark(r,c)); m.d.push(row);} }catch(e){ m=null; }
+  if(qrCache.size>300) qrCache.clear(); qrCache.set(k,m); return m;
+}
+const bcCache=new Map();
+function barcodeCanvas(val,color){
+  const k=val+"|"+color; if(bcCache.has(k)) return bcCache.get(k);
+  let c=document.createElement("canvas");
+  try{ if(!window.JsBarcode) throw 0; JsBarcode(c,val,{format:"CODE128",displayValue:false,margin:0,width:2,height:80,lineColor:color,background:"rgba(0,0,0,0)"}); }catch(e){ c=null; }
+  if(bcCache.size>300) bcCache.clear(); bcCache.set(k,c); return c;
+}
+function placeholder(ctx,x,y,w,h,label,s){
+  ctx.save(); ctx.strokeStyle="rgba(90,104,118,.7)"; ctx.setLineDash([3,3]); ctx.lineWidth=1; ctx.strokeRect(x+.5,y+.5,w-1,h-1);
+  ctx.fillStyle="rgba(90,104,118,.9)"; ctx.font=`600 ${Math.max(9,2.4*s)}px Figtree, sans-serif`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(label,x+w/2,y+h/2); ctx.restore();
+}
+function drawEl(ctx, el, rec, s, editor){
+  const x=el.x*s, y=el.y*s, w=el.w*s, h=el.h*s;
+  ctx.save();
+  switch(el.type){
+    case "rect":{
+      ctx.globalAlpha=el.opacity??1; rr(ctx,x,y,w,h,(el.radius||0)*s); ctx.fillStyle=el.fill; ctx.fill();
+      if(el.strokeW>0){ ctx.lineWidth=el.strokeW*s; ctx.strokeStyle=el.stroke; ctx.stroke(); }
+      break;}
+    case "text":{
+      let txt=fillTpl(el.text,rec); if(el.upper) txt=txt.toLocaleUpperCase("pt-BR");
+      let size=el.size*PT*s; const fam=`"${el.font}", sans-serif`, wt=el.bold?700:400, it=el.italic?"italic ":"";
+      const setF=z=>{ctx.font=`${it}${wt} ${z}px ${fam}`};
+      if("letterSpacing" in ctx) ctx.letterSpacing=((el.ls||0)*s)+"px";
+      setF(size);
+      let lines;
+      if(el.fit){ lines=txt.split("\n"); const mw=Math.max(1,...lines.map(l=>ctx.measureText(l).width)); if(mw>w){ size*=w/mw; setF(size); } }
+      else lines=wrapLines(ctx,txt,w);
+      const lh=size*(el.lh||1.15), total=lines.length*lh;
+      let ty=y; if(el.valign==="middle") ty=y+(h-total)/2; else if(el.valign==="bottom") ty=y+h-total;
+      ctx.fillStyle=el.color; ctx.textBaseline="top"; ctx.textAlign=el.align||"left";
+      const tx = el.align==="center" ? x+w/2 : el.align==="right" ? x+w : x;
+      if(el.strokeW>0){ ctx.lineJoin="round"; ctx.miterLimit=2; ctx.lineWidth=el.strokeW*s*2; ctx.strokeStyle=el.stroke||"#000000"; lines.forEach((l,i)=>ctx.strokeText(l,tx,ty+i*lh+(lh-size)/2)); }
+      lines.forEach((l,i)=>ctx.fillText(l,tx,ty+i*lh+(lh-size)/2));
+      break;}
+    case "photo":{
+      const rad = el.circle ? Math.min(w,h)/2 : (el.radius||0)*s;
+      const im = rec && rec.foto ? getImg(rec.foto) : null;
+      ctx.save(); rr(ctx,x,y,w,h,rad); ctx.clip();
+      if(im) drawFit(ctx,im,x,y,w,h,"cover",0.3);
+      else { ctx.fillStyle="#e3e8ec"; ctx.fillRect(x,y,w,h);
+        if(editor){ ctx.fillStyle="#b7c2cb"; ctx.beginPath(); ctx.arc(x+w/2,y+h*0.38,Math.min(w,h)*0.2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(x+w/2,y+h*0.98,w*0.42,h*0.3,0,0,Math.PI*2); ctx.fill(); } }
+      ctx.restore();
+      if(el.strokeW>0){ rr(ctx,x,y,w,h,rad); ctx.lineWidth=el.strokeW*s; ctx.strokeStyle=el.stroke; ctx.stroke(); }
+      break;}
+    case "image":{
+      const im=el.asset?getImg(el.asset):null;
+      ctx.globalAlpha=el.opacity??1;
+      if(im) drawFit(ctx,im,x,y,w,h,el.fit||"contain"); else if(editor) placeholder(ctx,x,y,w,h,el.label||"Imagem",s);
+      break;}
+    case "qr":{
+      const txt=fillTpl(el.text,rec);
+      const m = txt ? qrMatrix(txt, el.ecc) : null;
+      if(!m || !window.qrcode){ if(editor) placeholder(ctx,x,y,w,h,txt?"QR inválido":"QR vazio",s); break; }
+      const q=el.quiet??1, size=Math.min(w,h), mod=size/(m.n+2*q), ox=x+(w-size)/2, oy=y+(h-size)/2;
+      if(el.bg && el.bg!=="transparent" && !el.transparent){ ctx.fillStyle=el.bg; ctx.fillRect(ox,oy,size,size); }
+      ctx.fillStyle=el.color;
+      for(let r=0;r<m.n;r++) for(let c=0;c<m.n;c++) if(m.d[r][c]){
+        const x0=Math.round(ox+(c+q)*mod), x1=Math.round(ox+(c+q+1)*mod), y0=Math.round(oy+(r+q)*mod), y1=Math.round(oy+(r+q+1)*mod);
+        ctx.fillRect(x0,y0,x1-x0,y1-y0);
+      }
+      break;}
+    case "barcode":{
+      const txt=fillTpl(el.text,rec);
+      const c = txt ? barcodeCanvas(txt, el.color) : null;
+      if(!c){ if(editor) placeholder(ctx,x,y,w,h,txt?"Código inválido":"Código vazio",s); break; }
+      ctx.imageSmoothingEnabled=false; ctx.drawImage(c,x,y,w,h);
+      break;}
+  }
+  ctx.restore();
+}
+function drawCard(ctx, sideKey, rec, s, editor){
+  const {W,H}=dims(), sd=state.sides[sideKey];
+  ctx.save();
+  ctx.fillStyle=sd.bg.color||"#ffffff"; ctx.fillRect(0,0,W*s,H*s);
+  if(sd.bg.image){ const im=getImg(sd.bg.image); if(im) drawFit(ctx,im,0,0,W*s,H*s,sd.bg.fit||"cover"); }
+  for(const el of sd.els) drawEl(ctx,el,rec,s,editor);
+  ctx.restore();
+}
+
+/* ---------- editor ---------- */
+const cv=$("#cv"), ctx=cv.getContext("2d"), stage=$("#stage");
+let S=7, dpr=1;
+function fitCanvas(){
+  const {W,H}=dims();
+  const avail=Math.max(200, stage.clientWidth-32);
+  const maxH=Math.max(240, window.innerHeight-250);
+  const cw=Math.min(avail, maxH*W/H, 820);
+  S=cw/W; dpr=Math.min(3, window.devicePixelRatio||1);
+  cv.width=Math.round(cw*dpr); cv.height=Math.round(H*S*dpr);
+  cv.style.width=cw+"px"; cv.style.height=(H*S)+"px";
+  cv.style.borderRadius=(3.18*S)+"px";
+  draw();
+}
+function draw(){
+  if(ui.view!=="design") return;
+  const {W,H}=dims();
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W*S,H*S);
+  drawCard(ctx, ui.side, curRec(), S, true);
+  // margem de segurança 3 mm
+  ctx.save(); ctx.strokeStyle="rgba(214,51,108,.28)"; ctx.setLineDash([2,4]); ctx.lineWidth=1; ctx.strokeRect(3*S+.5,3*S+.5,(W-6)*S-1,(H-6)*S-1); ctx.restore();
+  const guide=getComputedStyle(document.documentElement).getPropertyValue("--guide").trim()||"#d6336c";
+  if(ui.guides){ ctx.save(); ctx.strokeStyle=guide; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+    if(ui.guides.v){ ctx.beginPath(); ctx.moveTo(W*S/2,0); ctx.lineTo(W*S/2,H*S); ctx.stroke(); }
+    if(ui.guides.h){ ctx.beginPath(); ctx.moveTo(0,H*S/2); ctx.lineTo(W*S,H*S/2); ctx.stroke(); }
+    ctx.restore(); }
+  const hv=side().els.find(e=>e.id===ui.hover);
+  if(hv && hv.id!==ui.sel){ ctx.save(); ctx.strokeStyle="rgba(29,107,88,.6)"; ctx.lineWidth=1; ctx.strokeRect(hv.x*S+.5,hv.y*S+.5,hv.w*S-1,hv.h*S-1); ctx.restore(); }
+  const el=selEl();
+  if(el){
+    const accent=getComputedStyle(document.documentElement).getPropertyValue("--accent").trim()||"#1d6b58";
+    ctx.save(); ctx.strokeStyle=accent; ctx.lineWidth=1.5; ctx.setLineDash([5,3]); ctx.strokeRect(el.x*S,el.y*S,el.w*S,el.h*S);
+    ctx.setLineDash([]); ctx.fillStyle="#ffffff"; ctx.strokeStyle=accent; const hs=10;
+    ctx.fillRect((el.x+el.w)*S-hs/2,(el.y+el.h)*S-hs/2,hs,hs); ctx.strokeRect((el.x+el.w)*S-hs/2,(el.y+el.h)*S-hs/2,hs,hs);
+    ctx.restore();
+  }
+}
+const toMM = e => { const b=cv.getBoundingClientRect(); return {x:(e.clientX-b.left)/S, y:(e.clientY-b.top)/S}; };
+function hitTest(p){ const els=side().els; for(let i=els.length-1;i>=0;i--){ const e=els[i]; if(p.x>=e.x&&p.x<=e.x+e.w&&p.y>=e.y&&p.y<=e.y+e.h) return e; } return null; }
+function onHandle(p){ const e=selEl(); if(!e) return false; const t=8/S; return Math.abs(p.x-(e.x+e.w))<=t && Math.abs(p.y-(e.y+e.h))<=t; }
+const snap = v => Math.round(v*4)/4;
+let drag=null;
+cv.addEventListener("pointerdown", e => {
+  const p=toMM(e);
+  if(onHandle(p)){ const el=selEl(); drag={mode:"resize",el,p,o:{...el},pushed:false}; }
+  else { const el=hitTest(p); if(el?.id!==ui.sel){ ui.sel=el?el.id:null; renderPanel(); }
+    drag = el ? {mode:"move",el,p,o:{...el},pushed:false} : null; }
+  if(drag) cv.setPointerCapture(e.pointerId);
+  draw();
+});
+cv.addEventListener("pointermove", e => {
+  const p=toMM(e); $("#cursorPos").textContent=`x ${p.x.toFixed(1).replace(".",",")} · y ${p.y.toFixed(1).replace(".",",")} mm`;
+  if(!drag){ const h=hitTest(p); const id=h?h.id:null; cv.style.cursor=onHandle(p)?"nwse-resize":h?"move":"default"; if(id!==ui.hover){ui.hover=id; draw();} return; }
+  const dx=p.x-drag.p.x, dy=p.y-drag.p.y; if(!drag.pushed && Math.hypot(dx,dy)<0.2) return;
+  if(!drag.pushed){ pushHist(); drag.pushed=true; }
+  const el=drag.el, o=drag.o, {W,H}=dims();
+  if(drag.mode==="move"){
+    let nx=snap(o.x+dx), ny=snap(o.y+dy); const g={};
+    if(Math.abs(nx+el.w/2-W/2)<0.8){ nx=r2(W/2-el.w/2); g.v=1; }
+    if(Math.abs(ny+el.h/2-H/2)<0.8){ ny=r2(H/2-el.h/2); g.h=1; }
+    el.x=nx; el.y=ny; ui.guides=g;
+  } else {
+    let nw=Math.max(1.5,snap(o.w+dx)), nh=Math.max(1.5,snap(o.h+dy));
+    if(el.type==="qr"){ const m=Math.max(nw,nh); nw=nh=m; }
+    else if(e.shiftKey || el.type==="photo" && el.circle){ const k=Math.max(nw/o.w, nh/o.h); nw=r2(o.w*k); nh=r2(o.h*k); }
+    el.w=nw; el.h=nh;
+  }
+  syncGeom(); draw();
+});
+const endDrag=()=>{ if(drag){ if(drag.pushed) save(); drag=null; ui.guides=null; draw(); } };
+cv.addEventListener("pointerup", endDrag); cv.addEventListener("pointercancel", endDrag);
+cv.addEventListener("pointerleave", ()=>{ if(!drag && ui.hover){ ui.hover=null; draw(); } });
+
+document.addEventListener("keydown", e => {
+  if(ui.view!=="design") return;
+  const tag=(e.target.tagName||"").toLowerCase(); const typing=/input|textarea|select/.test(tag);
+  const mod=e.ctrlKey||e.metaKey;
+  if(mod && e.key.toLowerCase()==="z" && !typing){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
+  if(mod && e.key.toLowerCase()==="y" && !typing){ e.preventDefault(); redo(); return; }
+  if(typing) return;
+  const el=selEl(); if(!el) return;
+  if(mod && e.key.toLowerCase()==="d"){ e.preventDefault(); duplicate(); return; }
+  if(e.key==="Delete"||e.key==="Backspace"){ e.preventDefault(); removeSel(); return; }
+  const st=e.shiftKey?2:0.5, mv={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[e.key];
+  if(mv){ e.preventDefault(); pushHist(); el.x=r2(el.x+mv[0]); el.y=r2(el.y+mv[1]); syncGeom(); draw(); save(); }
+  if(e.key==="Escape"){ ui.sel=null; renderPanel(); draw(); }
+});
+
+/* ---------- ações sobre elementos ---------- */
+function addEl(el){ pushHist(); side().els.push(el); ui.sel=el.id; renderPanel(); draw(); save(); }
+function centered(w,h){ const {W,H}=dims(); return {x:r2(W/2-w/2), y:r2(H/2-h/2), w, h}; }
+document.querySelectorAll("[data-add]").forEach(b => b.addEventListener("click", () => {
+  const t=b.dataset.add;
+  if(t==="text"){ const g=centered(40,5); addEl(T(g.x,g.y,g.w,g.h,"Novo texto",{size:9})); }
+  if(t==="field"){ const g=centered(44,5); addEl(T(g.x,g.y,g.w,g.h,"{"+(state.fields[0]||"nome")+"}",{size:9,bold:true,fit:true})); }
+  if(t==="photo"){ const g=centered(22,29); addEl({id:uid(),type:"photo",...g,radius:1.5,circle:false,stroke:"#ffffff",strokeW:0}); }
+  if(t==="qr"){ const g=centered(22,22); addEl({id:uid(),type:"qr",...g,text:"{"+(state.fields.includes("matricula")?"matricula":state.fields[0])+"}",color:"#000000",bg:"#ffffff",ecc:"M",quiet:1}); }
+  if(t==="barcode"){ const g=centered(40,8); addEl({id:uid(),type:"barcode",...g,text:"{"+(state.fields.includes("matricula")?"matricula":state.fields[0])+"}",color:"#000000"}); }
+  if(t==="rect"){ const g=centered(30,10); addEl(R(g.x,g.y,g.w,g.h,{fill:"#0f3d5e",radius:1})); }
+  if(t==="image"){ ui.imgTarget=null; $("#fileImg").click(); }
+}));
+$("#fileImg").addEventListener("change", async e => {
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  try{
+    const a=await fileToAsset(f,1400);
+    const target = ui.imgTarget && side().els.find(x=>x.id===ui.imgTarget);
+    if(target){ pushHist(); target.asset=a.id; draw(); save(); renderPanel(); return; }
+    let w=20, h=w*a.h/a.w; if(h>20){ h=20; w=h*a.w/a.h; }
+    const g=centered(r2(w),r2(h)); addEl({id:uid(),type:"image",...g,asset:a.id,fit:"contain",opacity:1});
+  }catch(err){ toast(err.message); }
+});
+function duplicate(){ const el=selEl(); if(!el) return; const c={...JSON.parse(JSON.stringify(el)),id:uid(),x:r2(el.x+2),y:r2(el.y+2)}; addEl(c); }
+function removeSel(){ const i=side().els.findIndex(e=>e.id===ui.sel); if(i<0) return; pushHist(); side().els.splice(i,1); ui.sel=null; renderPanel(); draw(); save(); }
+function moveLayer(dir){ const els=side().els, i=els.findIndex(e=>e.id===ui.sel), j=i+dir; if(i<0||j<0||j>=els.length) return; pushHist(); [els[i],els[j]]=[els[j],els[i]]; renderPanel(); draw(); save(); }
+
+/* ---------- painel ---------- */
+const panel=$("#panel");
+const num=(l,p,v,step=0.1)=>`<label class="f"><span>${l}</span><input type="number" id="p-${p}" data-prop="${p}" step="${step}" value="${r2(+v||0)}"></label>`;
+const col=(l,p,v,scope="")=>`<label class="f"><span>${l}</span><input type="color" id="p-${scope}${p}" data-prop="${p}" ${scope?`data-scope="${scope}"`:""} value="${esc(v)}"></label>`;
+const chk=(l,p,v)=>`<label class="c"><input type="checkbox" id="p-${p}" data-prop="${p}" ${v?"checked":""}> ${l}</label>`;
+const sel=(l,p,v,opts,scope="")=>`<label class="f"><span>${l}</span><select id="p-${scope}${p}" data-prop="${p}" ${scope?`data-scope="${scope}"`:""}>${opts.map(([k,t])=>`<option value="${esc(k)}" ${k==v?"selected":""}>${esc(t)}</option>`).join("")}</select></label>`;
+const chipsHTML=()=>`<div class="chips">${state.fields.map(f=>`<button class="chip" type="button" data-ins="{${esc(f)}}">{${esc(f)}}</button>`).join("")}</div>`;
+function geomHTML(el){ return `<div class="grid2">${num("X (mm)","x",el.x,0.25)}${num("Y (mm)","y",el.y,0.25)}${num("Largura (mm)","w",el.w,0.25)}${num("Altura (mm)","h",el.h,0.25)}</div>`; }
+function layersHTML(){
+  const els=side().els;
+  return `<div class="sect"><h3>Camadas · ${ui.side==="front"?"frente":"verso"}</h3><div class="layers">${
+    [...els].reverse().map(e=>`<button type="button" data-pick="${e.id}" aria-current="${e.id===ui.sel}"><span class="t">${TYPE_LABEL[e.type]}</span><span class="n">${esc(e.type==="text"||e.type==="qr"||e.type==="barcode"?e.text:e.type==="rect"?e.fill:e.type==="photo"?"Foto do aluno":"Imagem")}</span></button>`).join("") || `<p class="note">Nenhum elemento. Use a barra à esquerda.</p>`
+  }</div></div>`;
+}
+function renderPanel(){
+  const el=selEl();
+  if(!el){
+    const bg=side().bg;
+    panel.innerHTML=`
+      <div class="ph"><strong>Fundo · ${ui.side==="front"?"frente":"verso"}</strong></div>
+      ${col("Cor de fundo","color",bg.color,"bg")}
+      <div class="f"><span>Imagem de fundo</span><div class="thumb" style="${bg.image&&state.assets[bg.image]?`background-image:url(${state.assets[bg.image]})`:""}"></div></div>
+      <div class="row"><button class="btn sm pri" type="button" data-act="bgUp">${bg.image?"Trocar imagem":"Enviar imagem"}</button>${bg.image?`<button class="btn sm danger" type="button" data-act="bgDel">Remover</button>`:""}</div>
+      ${sel("Ajuste da imagem","fit",bg.fit,[["cover","Preencher (corta excesso)"],["contain","Caber inteira"],["stretch","Esticar"]],"bg")}
+      <p class="note">Tamanho ideal do fundo: ${state.orientation==="landscape"?"1011 × 638":"638 × 1011"} px (300 dpi). A linha rosa tracejada marca a margem de segurança de 3 mm.</p>
+      <div class="row"><button class="btn sm" type="button" data-act="copyBg">Copiar fundo para o ${ui.side==="front"?"verso":"frente"}</button></div>
+      ${layersHTML()}`;
+    return;
+  }
+  let body="";
+  if(el.type==="text"){
+    body=`
+      <label class="f"><span>Conteúdo — clique num campo para inserir</span><textarea id="p-text" data-prop="text">${esc(el.text)}</textarea></label>
+      ${chipsHTML()}
+      <div class="grid2">${sel("Fonte","font",el.font,FONTS.map(f=>[f,f]))}${num("Tamanho (pt)","size",el.size,0.2)}</div>
+      <div class="grid2">${col("Cor","color",el.color)}${num("Espaçamento (mm)","ls",el.ls||0,0.05)}</div>
+      <div class="row">
+        <div class="seg" role="group" aria-label="Alinhamento">${[["left","Esq."],["center","Centro"],["right","Dir."]].map(([k,t])=>`<button type="button" data-set="align" data-val="${k}" aria-pressed="${el.align===k}">${t}</button>`).join("")}</div>
+        <div class="seg" role="group" aria-label="Vertical">${[["top","Topo"],["middle","Meio"],["bottom","Base"]].map(([k,t])=>`<button type="button" data-set="valign" data-val="${k}" aria-pressed="${(el.valign||"top")===k}">${t}</button>`).join("")}</div>
+      </div>
+      <div class="row">${chk("Negrito","bold",el.bold)}${chk("Itálico","italic",el.italic)}${chk("MAIÚSCULAS","upper",el.upper)}</div>
+      ${chk("Reduzir para caber na largura (nomes longos)","fit",el.fit)}
+      <div class="grid2">${num("Contorno (mm)","strokeW",el.strokeW||0,0.05)}${col("Cor do contorno","stroke",el.stroke||"#000000")}</div>`;
+  }
+  if(el.type==="rect"){
+    body=`<div class="grid2">${col("Preenchimento","fill",el.fill)}${num("Opacidade (0–1)","opacity",el.opacity??1,0.05)}</div>
+      <div class="grid2">${num("Cantos (mm)","radius",el.radius||0,0.25)}${num("Borda (mm)","strokeW",el.strokeW||0,0.1)}</div>${col("Cor da borda","stroke",el.stroke||"#000000")}`;
+  }
+  if(el.type==="photo"){
+    body=`<p class="note">A foto vem de cada aluno (aba Alunos). Ela é recortada para preencher a moldura, priorizando o rosto.</p>
+      ${chk("Moldura redonda","circle",el.circle)}
+      <div class="grid2">${num("Cantos (mm)","radius",el.radius||0,0.25)}${num("Borda (mm)","strokeW",el.strokeW||0,0.1)}</div>${col("Cor da borda","stroke",el.stroke||"#ffffff")}
+      <p class="note">Proporção 3×4: largura × 1,33 = altura.</p>`;
+  }
+  if(el.type==="image"){
+    body=`<div class="thumb" style="${el.asset&&state.assets[el.asset]?`background-image:url(${state.assets[el.asset]});background-size:contain`:""}"></div>
+      <div class="row"><button class="btn sm pri" type="button" data-act="imgUp">${el.asset?"Trocar imagem":"Enviar imagem"}</button></div>
+      <div class="grid2">${sel("Ajuste","fit",el.fit||"contain",[["contain","Caber"],["cover","Preencher"],["stretch","Esticar"]])}${num("Opacidade (0–1)","opacity",el.opacity??1,0.05)}</div>`;
+  }
+  if(el.type==="qr"){
+    const sample=fillTpl(el.text,curRec());
+    body=`<label class="f"><span>Conteúdo do QR (link, matrícula, texto…)</span><textarea id="p-text" data-prop="text">${esc(el.text)}</textarea></label>
+      ${chipsHTML()}
+      <p class="note">Gera: <code>${esc(sample.slice(0,90))}${sample.length>90?"…":""}</code></p>
+      <div class="grid2">${col("Cor","color",el.color)}${col("Fundo","bg",el.bg==="transparent"?"#ffffff":el.bg)}</div>
+      ${chk("Fundo transparente","transparent",el.transparent)}
+      <div class="grid2">${sel("Correção de erro","ecc",el.ecc||"M",[["L","Baixa (L)"],["M","Média (M)"],["Q","Alta (Q)"],["H","Máxima (H)"]])}${num("Margem (módulos)","quiet",el.quiet??1,1)}</div>
+      <p class="note">Para leitura na catraca, mantenha o QR com pelo menos 18 mm e alto contraste.</p>`;
+  }
+  if(el.type==="barcode"){
+    body=`<label class="f"><span>Conteúdo (Code 128)</span><textarea id="p-text" data-prop="text">${esc(el.text)}</textarea></label>${chipsHTML()}${col("Cor das barras","color",el.color)}`;
+  }
+  panel.innerHTML=`
+    <div class="ph"><strong>${TYPE_LABEL[el.type]}</strong><button class="btn sm" type="button" data-act="desel">Fundo</button></div>
+    ${body}
+    <div class="sect"><h3>Posição e tamanho</h3>${geomHTML(el)}
+      <div class="row"><button class="btn sm" type="button" data-act="center-h">Centralizar ↔</button><button class="btn sm" type="button" data-act="center-v">Centralizar ↕</button></div></div>
+    <div class="sect"><h3>Ações</h3><div class="row">
+      <button class="btn sm" type="button" data-act="up">Trazer p/ frente</button><button class="btn sm" type="button" data-act="down">Enviar p/ trás</button>
+      <button class="btn sm" type="button" data-act="dup">Duplicar</button><button class="btn sm danger" type="button" data-act="del">Excluir</button></div></div>
+    ${layersHTML()}`;
+}
+function syncGeom(){ const el=selEl(); if(!el) return; for(const k of ["x","y","w","h"]){ const i=panel.querySelector(`[data-prop="${k}"]`); if(i && document.activeElement!==i) i.value=r2(el[k]); } }
+let editPending=false;
+panel.addEventListener("focusin", ()=>{ editPending=true; });
+function onProp(e){
+  const t=e.target, p=t.dataset.prop; if(!p) return;
+  let v = t.type==="checkbox" ? t.checked : t.type==="number" ? parseFloat(t.value) : t.value;
+  if(t.type==="number" && !isFinite(v)) return;
+  if(editPending){ pushHist(); editPending=false; }
+  if(t.dataset.scope==="bg") side().bg[p]=v;
+  else { const el=selEl(); if(!el) return; if(["w","h"].includes(p)) v=Math.max(0.5,v); el[p]=v; if(el.type==="qr" && (p==="w"||p==="h")){ el.w=el.h=v; syncGeom(); } if(p==="circle"&&v){ const m=Math.min(el.w,el.h); el.w=el.h=m; syncGeom(); } }
+  draw(); save();
+  if(e.type==="change" && (p==="circle"||p==="transparent")) renderPanel();
+}
+panel.addEventListener("input", onProp);
+panel.addEventListener("change", e=>{ if(e.target.type==="checkbox"||e.target.tagName==="SELECT") onProp(e); else if(e.target.dataset.prop==="text") renderPanel(); });
+panel.addEventListener("click", e => {
+  const ins=e.target.closest("[data-ins]");
+  if(ins){ const ta=panel.querySelector("textarea[data-prop]"), el=selEl(); if(!ta||!el) return; pushHist();
+    const a=ta.selectionStart??ta.value.length, b=ta.selectionEnd??a; ta.value=ta.value.slice(0,a)+ins.dataset.ins+ta.value.slice(b); el.text=ta.value; draw(); save(); ta.focus(); const pos=a+ins.dataset.ins.length; ta.setSelectionRange(pos,pos); return; }
+  const pick=e.target.closest("[data-pick]"); if(pick){ ui.sel=pick.dataset.pick; renderPanel(); draw(); return; }
+  const set=e.target.closest("[data-set]"); if(set){ const el=selEl(); if(!el) return; pushHist(); el[set.dataset.set]=set.dataset.val; renderPanel(); draw(); save(); return; }
+  const act=e.target.closest("[data-act]")?.dataset.act; if(!act) return;
+  const el=selEl(), {W,H}=dims();
+  if(act==="desel"){ ui.sel=null; renderPanel(); draw(); }
+  if(act==="del") removeSel();
+  if(act==="dup") duplicate();
+  if(act==="up") moveLayer(1);
+  if(act==="down") moveLayer(-1);
+  if(act==="center-h"&&el){ pushHist(); el.x=r2(W/2-el.w/2); syncGeom(); draw(); save(); }
+  if(act==="center-v"&&el){ pushHist(); el.y=r2(H/2-el.h/2); syncGeom(); draw(); save(); }
+  if(act==="imgUp"&&el){ ui.imgTarget=el.id; $("#fileImg").click(); }
+  if(act==="bgUp") $("#fileBg").click();
+  if(act==="bgDel"){ pushHist(); side().bg.image=null; renderPanel(); draw(); save(); }
+  if(act==="copyBg"){ pushHist(); const other=ui.side==="front"?"back":"front"; state.sides[other].bg={...side().bg}; save(); toast("Fundo copiado para o "+(other==="front"?"frente":"verso")+"."); }
+});
+$("#fileBg").addEventListener("change", async e => {
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  try{ const a=await fileToAsset(f,2100); pushHist(); side().bg.image=a.id; renderPanel(); draw(); save(); }catch(err){ toast(err.message); }
+});
+
+/* ---------- barra do palco ---------- */
+document.querySelectorAll("[data-side]").forEach(b=>b.addEventListener("click",()=>{ ui.side=b.dataset.side; ui.sel=null; updSegs(); renderPanel(); draw(); }));
+document.querySelectorAll("[data-or]").forEach(b=>b.addEventListener("click",()=>{
+  const nv=b.dataset.or; if(nv===state.orientation) return;
+  pushHist(); const a=dims(); state.orientation=nv; const n=dims();
+  for(const k of ["front","back"]) for(const el of state.sides[k].els){
+    if(el.type==="rect" && el.w>=a.W-0.01){ el.w=n.W; el.x=0; el.y=r2(el.y*n.H/a.H); continue; }
+    el.x=r2(el.x*n.W/a.W); el.y=r2(el.y*n.H/a.H);
+    if(el.w>n.W){ const k2=n.W/el.w*0.9; el.w=r2(el.w*k2); if(el.type!=="text") el.h=r2(el.h*k2); }
+    if(el.x+el.w>n.W) el.x=r2(Math.max(0,n.W-el.w));
+    if(el.y+el.h>n.H) el.y=r2(Math.max(0,n.H-el.h));
+  }
+  save(); updSegs(); fitCanvas(); renderPanel();
+  toast("Elementos reposicionados proporcionalmente. Ajuste o layout se precisar.");
+}));
+function updSegs(){
+  document.querySelectorAll("[data-side]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.side===ui.side));
+  document.querySelectorAll("[data-or]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.or===state.orientation));
+  const {W,H}=dims(); $("#specTag").textContent=`CR80 · ${String(W).replace(".",",")} × ${String(H).replace(".",",")} mm`;
+}
+function renderRecSel(){
+  const s=$("#recSel");
+  s.innerHTML=`<option value="-1">Mostrar nomes dos campos</option>`+state.records.map((r,i)=>`<option value="${i}">${i+1}. ${esc(r.nome||r[state.fields[0]]||"(sem nome)")}</option>`).join("");
+  if(ui.rec>=state.records.length) ui.rec=state.records.length-1;
+  s.value=String(ui.rec);
+  const r=curRec(); $("#curName").textContent = r ? `${r.nome||"(sem nome)"} — ${r.matricula||""}` : "Nenhum aluno selecionado: o cartão sai com os nomes dos campos.";
+}
+$("#recSel").addEventListener("change",e=>{ ui.rec=+e.target.value; renderRecSel(); draw(); if(selEl()?.type==="qr") renderPanel(); });
+$("#recPrev").addEventListener("click",()=>{ if(!state.records.length) return; ui.rec = ui.rec<=0 ? state.records.length-1 : ui.rec-1; renderRecSel(); draw(); });
+$("#recNext").addEventListener("click",()=>{ if(!state.records.length) return; ui.rec = (ui.rec+1)%state.records.length; renderRecSel(); draw(); });
+$("#undo").addEventListener("click",undo); $("#redo").addEventListener("click",redo);
+
+/* ---------- abas ---------- */
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.view)));
+function setView(v){
+  ui.view=v;
+  document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===v));
+  $("#view-design").hidden=v!=="design"; $("#view-dados").hidden=v!=="dados"; $("#view-exportar").hidden=v!=="exportar"; $("#view-conta").hidden=v!=="conta";
+  if(v==="conta") renderUsers();
+  if(v==="design"){ fitCanvas(); renderPanel(); renderRecSel(); }
+  if(v==="dados") renderTable();
+  if(v==="exportar"){ renderRecSel(); a4Info(); }
+}
+
+/* ---------- dados ---------- */
+const normKey = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim().replace(/\s+/g,"_").replace(/[^a-z0-9_]/g,"");
+const normCmp = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
+function renderFields(){
+  $("#fieldbar").innerHTML=`<strong style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Campos</strong>`+
+    state.fields.map(f=>`<span class="fchip">{${esc(f)}}<button type="button" data-delf="${esc(f)}" aria-label="Remover campo ${esc(f)}">×</button></span>`).join("")+
+    `<input type="text" id="newField" placeholder="novo campo (ex.: rg)" style="width:170px"><button class="btn sm" type="button" id="addField">Adicionar campo</button>`;
+}
+function renderTable(){
+  renderFields();
+  const f=state.fields;
+  const head=`<thead><tr><th>#</th><th>Foto</th>${f.map(k=>`<th>${esc(k)}</th>`).join("")}<th></th></tr></thead>`;
+  const rows=state.records.map((r,i)=>`<tr>
+    <td class="num">${i+1}</td>
+    <td><button class="ph-btn" type="button" data-photo="${i}" style="${r.foto&&state.assets[r.foto]?`background-image:url(${state.assets[r.foto]})`:""}" aria-label="Foto de ${esc(r.nome||"aluno")}">${r.foto&&state.assets[r.foto]?"":"+ foto"}</button></td>
+    ${f.map(k=>`<td><input type="text" id="c-${r._id}-${esc(k)}" data-r="${i}" data-k="${esc(k)}" value="${esc(r[k])}"></td>`).join("")}
+    <td style="white-space:nowrap"><button class="btn sm" type="button" data-view-rec="${i}">Ver no cartão</button> <button class="btn sm danger" type="button" data-del-rec="${i}" aria-label="Remover linha">×</button></td>
+  </tr>`).join("");
+  $("#tbl").innerHTML=head+`<tbody>${rows||`<tr><td colspan="${f.length+3}" style="padding:24px;color:var(--muted)">Nenhum aluno. Clique em “Adicionar aluno” ou importe uma planilha CSV.</td></tr>`}</tbody>`;
+}
+$("#tbl").addEventListener("input",e=>{ const t=e.target; if(t.dataset.r==null) return; state.records[+t.dataset.r][t.dataset.k]=t.value; save(); });
+$("#tbl").addEventListener("click",e=>{
+  const ph=e.target.closest("[data-photo]"); if(ph){ ui.photoTarget=+ph.dataset.photo; $("#filePhoto").click(); return; }
+  const vr=e.target.closest("[data-view-rec]"); if(vr){ ui.rec=+vr.dataset.viewRec; ui.side="front"; updSegs(); setView("design"); return; }
+  const dr=e.target.closest("[data-del-rec]"); if(dr){ state.records.splice(+dr.dataset.delRec,1); if(ui.rec>=state.records.length) ui.rec=state.records.length-1; renderTable(); save(); }
+});
+$("#filePhoto").addEventListener("change",async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f) return; const r=state.records[ui.photoTarget]; if(!r) return;
+  try{ const a=await fileToAsset(f,900); r.foto=a.id; renderTable(); save(); }catch(err){ toast(err.message); }
+});
+$("#fieldbar").addEventListener("click",e=>{
+  const d=e.target.closest("[data-delf]");
+  if(d){ const k=d.dataset.delf; if(state.fields.length<=1){ toast("Mantenha pelo menos um campo."); return; } pushHist(); state.fields=state.fields.filter(x=>x!==k); renderTable(); save(); toast(`Campo {${k}} removido. Textos que usam ele ficarão em branco.`); return; }
+  if(e.target.id==="addField") addFieldFromInput();
+});
+$("#fieldbar").addEventListener("keydown",e=>{ if(e.target.id==="newField"&&e.key==="Enter"){ e.preventDefault(); addFieldFromInput(); } });
+function addFieldFromInput(){ const i=$("#newField"); const k=normKey(i.value); if(!k){ toast("Digite um nome de campo com letras ou números."); return; } if(k==="foto"||k==="_id"){ toast("Esse nome é reservado."); return; } if(state.fields.includes(k)){ toast(`O campo {${k}} já existe.`); return; } pushHist(); state.fields.push(k); renderTable(); save(); toast(`Campo {${k}} criado. Use-o no design.`); }
+$("#addRec").addEventListener("click",()=>{ const r={_id:rid("r"),foto:null}; state.fields.forEach(k=>r[k]=""); state.records.push(r); renderTable(); save(); const inp=document.getElementById(`c-${r._id}-${state.fields[0]}`); inp&&inp.focus(); });
+let clearArm=0;
+$("#clearRecs").addEventListener("click",e=>{
+  const b=e.currentTarget;
+  if(Date.now()-clearArm>4000){ clearArm=Date.now(); b.textContent="Clique de novo para confirmar"; setTimeout(()=>{ b.textContent="Remover todos"; },4000); return; }
+  clearArm=0; b.textContent="Remover todos"; state.records=[]; ui.rec=-1; renderTable(); save(); toast("Lista de alunos esvaziada.");
+});
+function parseCSV(text){
+  text=text.replace(/^﻿/,"");
+  const first=text.split(/\r?\n/)[0]||"";
+  const d=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length && first.includes(";") ? ";" : (first.includes("\t")?"\t":",");
+  const rows=[]; let row=[], cell="", q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=c; }
+    else if(c==='"') q=true;
+    else if(c===d){ row.push(cell); cell=""; }
+    else if(c==="\n"||c==="\r"){ if(c==="\r"&&text[i+1]==="\n") i++; row.push(cell); rows.push(row); row=[]; cell=""; }
+    else cell+=c;
+  }
+  if(cell!==""||row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(r=>r.some(x=>x.trim()!==""));
+}
+$("#impCsv").addEventListener("click",()=>$("#fileCsv").click());
+$("#fileCsv").addEventListener("change",async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  const buf=await f.arrayBuffer(); let text=new TextDecoder("utf-8").decode(buf);
+  if(text.includes("\uFFFD")) text=new TextDecoder("windows-1252").decode(buf);
+  const rows=parseCSV(text); if(rows.length<2){ toast("A planilha precisa de uma linha de títulos e pelo menos um aluno."); return; }
+  const head=rows[0].map(normKey);
+  pushHist();
+  head.forEach(k=>{ if(k && k!=="foto" && !state.fields.includes(k)) state.fields.push(k); });
+  const recs=rows.slice(1).map(r=>{ const o={_id:rid("r"),foto:null}; state.fields.forEach(k=>o[k]=""); head.forEach((k,i)=>{ if(k&&k!=="foto") o[k]=(r[i]||"").trim(); }); return o; });
+  if($("#csvMode").value==="replace"){ state.records=recs; } else state.records.push(...recs);
+  ui.rec=state.records.length?0:-1; renderTable(); save();
+  toast(`${recs.length} aluno(s) importado(s).`);
+});
+$("#impPhotos").addEventListener("click",()=>$("#filePhotos").click());
+$("#filePhotos").addEventListener("change",async e=>{
+  const files=[...e.target.files]; e.target.value=""; if(!files.length) return;
+  let ok=0; const miss=[];
+  for(const f of files){
+    const base=normCmp(f.name.replace(/\.[^.]+$/,""));
+    const r=state.records.find(r=>normCmp(r.matricula)===base) || state.records.find(r=>normCmp(r.nome)===base);
+    if(!r){ miss.push(f.name); continue; }
+    try{ const a=await fileToAsset(f,900); r.foto=a.id; ok++; }catch{ miss.push(f.name); }
+  }
+  renderTable(); save();
+  toast(`${ok} foto(s) associada(s).`+(miss.length?` Sem correspondência: ${miss.slice(0,3).join(", ")}${miss.length>3?"…":""}`:""));
+});
+
+/* ---------- exportar ---------- */
+let fontsP=null;
+function fontsReady(){ if(!fontsP){ fontsP=Promise.all(FONTS.flatMap(f=>[`400 20px "${f}"`,`700 20px "${f}"`,`italic 400 20px "${f}"`].map(s=>document.fonts.load(s).catch(()=>null)))).then(()=>document.fonts.ready); } return fontsP; }
+async function prepare(recs){
+  const ids=new Set(); for(const k of ["front","back"]){ const s=state.sides[k]; if(s.bg.image) ids.add(s.bg.image); s.els.forEach(e=>e.asset&&ids.add(e.asset)); }
+  recs.forEach(r=>r&&r.foto&&ids.add(r.foto));
+  await Promise.all([...ids].map(loadImg)); await fontsReady();
+}
+function renderOff(sideKey, rec, dpi){
+  const {W,H}=dims(), s=dpi/25.4, c=document.createElement("canvas");
+  c.width=Math.round(W*s); c.height=Math.round(H*s);
+  drawCard(c.getContext("2d"), sideKey, rec, s, false); return c;
+}
+const toBlob=(c,type="image/png",q)=>new Promise(r=>c.toBlob(r,type,q));
+const slug=s=>normKey(s||"cartao").replace(/_+/g,"-").slice(0,50)||"cartao";
+async function saveFile(filename, data){
+  if(window.claude && typeof window.claude.use==="function"){
+    let dl=null; try{ dl=await window.claude.use("downloads"); }catch{}
+    if(!dl){ toast("Downloads não estão disponíveis nesta visualização. Abra o artefato no claude.ai."); return false; }
+    try{ await dl.save({filename,data}); toast("Arquivo pronto: "+filename); return true; }
+    catch(e){ toast(e && e.code==="declined" ? "Download cancelado." : "Não foi possível salvar o arquivo ("+(e&&(e.message||e.code))+")."); return false; }
+  }
+  const blob=data instanceof Blob?data:new Blob([data]); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); return true;
+}
+async function exportPng(sideKey){
+  const r=curRec(), dpi=+$("#dpi").value; await prepare([r]);
+  const blob=await toBlob(renderOff(sideKey,r,dpi));
+  await saveFile(`cracha-${slug(r?.nome||"modelo")}-${sideKey==="front"?"frente":"verso"}.png`, blob);
+}
+$("#pngFront").addEventListener("click",()=>exportPng("front"));
+$("#pngBack").addEventListener("click",()=>exportPng("back"));
+function a4Grid(){ const {W,H}=dims(); const cols=Math.floor(190/W), rows=Math.floor(277/H); return {cols,rows,mx:(210-cols*W)/2,my:(297-rows*H)/2}; }
+function a4Info(){ const g=a4Grid(); $("#a4Info").textContent = $("#pdfLayout").value==="a4" ? `A4: ${g.cols*g.rows} cartões por folha (${g.cols} × ${g.rows}). O verso sai espelhado para impressão frente e verso pela borda longa.` : "Cada aluno ocupa uma página no tamanho exato do cartão (frente e, em seguida, verso). Ideal para Evolis, Zebra, Fargo e similares."; }
+$("#pdfLayout").addEventListener("change",a4Info);
+$("#pdfGo").addEventListener("click",async e=>{
+  if(!window.jspdf){ toast("A biblioteca de PDF não carregou. Recarregue a página."); return; }
+  const btn=e.currentTarget; const recs = $("#pdfRange").value==="cur" ? [curRec()] : (state.records.length?state.records:[null]);
+  const withBack=$("#pdfBack").checked, dpi=+$("#dpi").value, {W,H}=dims(), layout=$("#pdfLayout").value;
+  btn.disabled=true; btn.textContent="Gerando…";
+  try{
+    await prepare(recs);
+    const {jsPDF}=window.jspdf; const orient=W>H?"landscape":"portrait";
+    const img=(side,r)=>renderOff(side,r,dpi).toDataURL("image/jpeg",0.95);
+    let doc;
+    if(layout==="card"){
+      doc=new jsPDF({orientation:orient,unit:"mm",format:[W,H],compress:true});
+      for(let i=0;i<recs.length;i++){
+        if(i>0) doc.addPage([W,H],orient);
+        doc.addImage(img("front",recs[i]),"JPEG",0,0,W,H);
+        if(withBack){ doc.addPage([W,H],orient); doc.addImage(img("back",recs[i]),"JPEG",0,0,W,H); }
+        if(i%3===2){ toast(`Gerando PDF… ${i+1}/${recs.length}`); await new Promise(r=>setTimeout(r)); }
+      }
+    } else {
+      doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});
+      const g=a4Grid(), per=g.cols*g.rows; let first=true;
+      const marks=()=>{ doc.setLineWidth(0.1); doc.setDrawColor(0);
+        for(let c=0;c<=g.cols;c++){ const x=g.mx+c*W; doc.line(x,g.my-6,x,g.my-1.5); doc.line(x,g.my+g.rows*H+1.5,x,g.my+g.rows*H+6); }
+        for(let r=0;r<=g.rows;r++){ const y=g.my+r*H; doc.line(g.mx-6,y,g.mx-1.5,y); doc.line(g.mx+g.cols*W+1.5,y,g.mx+g.cols*W+6,y); } };
+      for(let p=0;p<recs.length;p+=per){
+        const chunk=recs.slice(p,p+per);
+        for(const sideKey of withBack?["front","back"]:["front"]){
+          if(!first) doc.addPage("a4","portrait"); first=false;
+          chunk.forEach((r,i)=>{ let c=i%g.cols; const rw=Math.floor(i/g.cols); if(sideKey==="back") c=g.cols-1-c;
+            doc.addImage(img(sideKey,r),"JPEG",g.mx+c*W,g.my+rw*H,W,H); });
+          marks();
+          toast(`Gerando PDF… ${Math.min(p+per,recs.length)}/${recs.length}`); await new Promise(r=>setTimeout(r));
+        }
+      }
+    }
+    await saveFile(`crachas-${layout==="a4"?"a4":"cr80"}-${recs.length}.pdf`, doc.output("blob"));
+  }catch(err){ toast("Erro ao gerar o PDF: "+err.message); }
+  finally{ btn.disabled=false; btn.textContent="Gerar PDF"; }
+});
+async function assetAsDataUrl(id){
+  if(localAssets[id]) return localAssets[id];
+  const r=await fetch(assetSrc(id),{credentials:"same-origin"}); if(!r.ok) return null;
+  const blob=await r.blob();
+  return await new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=()=>res(null); fr.readAsDataURL(blob); });
+}
+$("#saveTpl").addEventListener("click",async e=>{
+  const btn=e.currentTarget; btn.disabled=true;
+  try{
+    const inc=$("#incData").checked;
+    const ids=new Set(); for(const k of ["front","back"]){ const s=state.sides[k]; if(s.bg.image) ids.add(s.bg.image); s.els.forEach(x=>x.asset&&ids.add(x.asset)); }
+    if(inc) state.records.forEach(r=>r.foto&&ids.add(r.foto));
+    const assets={}; for(const id of ids){ const d=await assetAsDataUrl(id); if(d) assets[id]=d; }
+    const out={version:2, name:curTpl?curTpl.name:"Modelo", orientation:state.orientation, fields:state.fields, sides:state.sides, records:inc?state.records:[], assets};
+    await saveFile(`modelo-${slug(curTpl?curTpl.name:"cracha")}.json`, JSON.stringify(out));
+  }finally{ btn.disabled=false; }
+});
+$("#openTpl").addEventListener("click",()=>$("#fileTpl").click());
+$("#fileTpl").addEventListener("change",async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  try{
+    const d=JSON.parse(await f.text()); if(!d.sides||!d.sides.front||!d.sides.back) throw new Error("arquivo não é um modelo deste editor");
+    for(const [id,src] of Object.entries(d.assets||{})) if(typeof src==="string"&&src.startsWith("data:image/")) registerAsset(src,id);
+    await flush();
+    const name=(d.name||f.name.replace(/\.json$/i,"")).slice(0,80)+" (importado)";
+    const t=await api("POST","/templates",{name,data:{version:2,orientation:d.orientation||"landscape",sides:d.sides}});
+    let added=0;
+    if(Array.isArray(d.records)&&d.records.length){
+      (d.fields||[]).forEach(k=>{ if(!state.fields.includes(k)) state.fields.push(k); });
+      d.records.forEach(r=>{ state.records.push({...r,_id:rid("r")}); added++; });
+    }
+    templates=await api("GET","/templates");
+    await openTemplate(t);
+    if(added) save();
+    toast(`Modelo “${t.name}” criado.`+(added?` ${added} aluno(s) adicionado(s) à lista.`:""));
+  }catch(err){ toast("Não foi possível abrir: "+err.message); }
+});
+$("#csvModel").addEventListener("click",()=>{
+  const f=state.fields, q=v=>/[;"\n]/.test(v)?`"${String(v).replace(/"/g,'""')}"`:v;
+  const ex=state.records[0]||{};
+  const csv="﻿"+f.join(";")+"\r\n"+f.map(k=>q(ex[k]||"")).join(";")+"\r\n";
+  saveFile("alunos-modelo.csv", csv);
+});
+let resetArm=0;
+$("#resetAll").addEventListener("click",e=>{
+  const b=e.currentTarget;
+  if(Date.now()-resetArm>4000){ resetArm=Date.now(); b.textContent="Clique de novo: troca o layout deste modelo"; setTimeout(()=>{ b.textContent="Restaurar layout de exemplo"; },4000); return; }
+  resetArm=0; b.textContent="Restaurar layout de exemplo";
+  pushHist(); const d=defaultState(); state.orientation=d.orientation; state.sides=d.sides;
+  DEFAULT_FIELDS.forEach(k=>{ if(!state.fields.includes(k)) state.fields.push(k); });
+  ui.sel=null; fullRefresh(); save(); toast("Layout de exemplo aplicado. Use Desfazer para voltar.");
+});
+
+/* ---------- modelos ---------- */
+function renderTplSel(){
+  $("#tplSel").innerHTML=templates.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("");
+  if(curTpl) $("#tplSel").value=String(curTpl.id);
+  $("#tplDel").disabled = templates.length<=1;
+}
+async function openTemplate(t){
+  curTpl={id:t.id,name:t.name,updated_at:t.updated_at};
+  const d=t.data||{};
+  state.orientation=d.orientation||"landscape";
+  state.sides=d.sides||defaultState().sides;
+  ui.sel=null; ui.side="front"; hist.undo=[]; hist.redo=[]; updHist();
+  last.tpl=JSON.stringify(layoutOf());
+  renderTplSel(); fullRefresh();
+}
+$("#tplSel").addEventListener("change",async e=>{
+  const id=+e.target.value; if(curTpl&&id===curTpl.id) return;
+  try{ await flush(); const t=await api("GET","/templates/"+id); await openTemplate(t); }
+  catch(err){ toast(err.message); renderTplSel(); }
+});
+$("#tplNew").addEventListener("click",async()=>{
+  const name=(prompt("Nome do novo modelo (ex.: Crachá de funcionário):","Novo modelo")||"").trim(); if(!name) return;
+  try{
+    await flush();
+    const blank={version:2,orientation:"landscape",sides:{front:{bg:{color:"#ffffff",image:null,fit:"cover"},els:[]},back:{bg:{color:"#ffffff",image:null,fit:"cover"},els:[]}}};
+    const t=await api("POST","/templates",{name,data:blank});
+    templates=await api("GET","/templates"); await openTemplate(t); toast(`Modelo “${name}” criado. Comece enviando o fundo.`);
+  }catch(err){ toast(err.message); }
+});
+$("#tplDup").addEventListener("click",async()=>{
+  if(!curTpl) return;
+  const name=(prompt("Nome da cópia:",curTpl.name+" (cópia)")||"").trim(); if(!name) return;
+  try{ await flush(); const t=await api("POST","/templates",{name,data:layoutOf()}); templates=await api("GET","/templates"); await openTemplate(t); toast("Modelo duplicado."); }
+  catch(err){ toast(err.message); }
+});
+$("#tplRename").addEventListener("click",async()=>{
+  if(!curTpl) return;
+  const name=(prompt("Novo nome do modelo:",curTpl.name)||"").trim(); if(!name||name===curTpl.name) return;
+  try{ await api("PUT","/templates/"+curTpl.id,{name}); curTpl.name=name; templates=await api("GET","/templates"); renderTplSel(); toast("Modelo renomeado."); }
+  catch(err){ toast(err.message); }
+});
+$("#tplDel").addEventListener("click",async()=>{
+  if(!curTpl||templates.length<=1) return;
+  if(!confirm(`Excluir o modelo “${curTpl.name}”? Os alunos não são apagados.`)) return;
+  try{
+    clearTimeout(saveT); last.tpl=JSON.stringify(layoutOf());
+    await api("DELETE","/templates/"+curTpl.id);
+    templates=await api("GET","/templates");
+    const t=await api("GET","/templates/"+templates[0].id); await openTemplate(t); toast("Modelo excluído.");
+  }catch(err){ toast(err.message); }
+});
+
+/* ---------- conta e usuários ---------- */
+const isAdmin = () => BOOT.user && BOOT.user.role==="admin";
+const fmtDate = s => s ? new Date(s).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}) : "nunca";
+async function renderUsers(){
+  if(!isAdmin()) return;
+  try{
+    const us=await api("GET","/users");
+    $("#usersTbl").innerHTML=`<thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Situação</th><th>Último acesso</th><th></th></tr></thead><tbody>${us.map(u=>`<tr>
+      <td>${esc(u.name)}${u.id===BOOT.user.id?' <span class="pill">você</span>':''}</td>
+      <td style="font-family:var(--f-mono);font-size:12px">${esc(u.email)}</td>
+      <td>${u.role==="admin"?"Administrador":"Usuário"}</td>
+      <td><span class="pill ${u.active?"on":"off"}">${u.active?"Ativo":"Desativado"}</span></td>
+      <td style="font-size:12px;color:var(--muted)">${fmtDate(u.last_login_at)}</td>
+      <td style="white-space:nowrap">${u.id===BOOT.user.id?"":`
+        <button class="btn sm" type="button" data-u="${u.id}" data-uact="pw">Nova senha</button>
+        <button class="btn sm" type="button" data-u="${u.id}" data-uact="role" data-role="${u.role}">${u.role==="admin"?"Tornar usuário":"Tornar admin"}</button>
+        <button class="btn sm ${u.active?"danger":""}" type="button" data-u="${u.id}" data-uact="active" data-on="${u.active}">${u.active?"Desativar":"Reativar"}</button>`}</td>
+    </tr>`).join("")}</tbody>`;
+  }catch(err){ toast(err.message); }
+}
+$("#usersTbl").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-uact]"); if(!b) return;
+  const id=+b.dataset.u, act=b.dataset.uact;
+  try{
+    if(act==="pw"){ const p=(prompt("Nova senha para este usuário (mín. 8 caracteres):")||"").trim(); if(!p) return; await api("PUT","/users/"+id,{password:p}); toast("Senha alterada. Passe a nova senha ao usuário."); }
+    if(act==="role"){ await api("PUT","/users/"+id,{role:b.dataset.role==="admin"?"user":"admin"}); toast("Perfil alterado."); }
+    if(act==="active"){ await api("PUT","/users/"+id,{active:b.dataset.on!=="true"}); toast(b.dataset.on==="true"?"Usuário desativado: o acesso foi bloqueado.":"Usuário reativado."); }
+    renderUsers();
+  }catch(err){ toast(err.message); }
+});
+$("#newUserForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  try{
+    await api("POST","/users",{name:$("#nuName").value,email:$("#nuEmail").value,password:$("#nuPass").value,role:$("#nuRole").value});
+    toast(`Usuário criado. Login: ${$("#nuEmail").value.trim().toLowerCase()}`);
+    e.target.reset(); renderUsers();
+  }catch(err){ toast(err.message); }
+});
+$("#pwForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  try{ await api("PUT","/me/password",{current:$("#pwCur").value,password:$("#pwNew").value}); e.target.reset(); toast("Senha alterada."); }
+  catch(err){ toast(err.message); }
+});
+
+/* ---------- utilidades ---------- */
+let toastT;
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),3600); }
+function fullRefresh(){ updSegs(); renderRecSel(); renderPanel(); if(ui.view==="dados") renderTable(); fitCanvas(); }
+
+new ResizeObserver(()=>{ if(ui.view==="design") fitCanvas(); }).observe(stage);
+window.addEventListener("resize",()=>{ if(ui.view==="design") fitCanvas(); });
+document.fonts && document.fonts.addEventListener && document.fonts.addEventListener("loadingdone",()=>draw());
+fontsReady().then(draw);
+async function boot(){
+  $("#whoName").textContent = BOOT.user ? BOOT.user.name : "";
+  $("#logoutForm").action = BASE+"/logout";
+  if(isAdmin()){ $("#tab-conta").textContent="Usuários"; $("#contaTitle").textContent="Usuários"; $("#contaSub").textContent="Quem pode entrar no sistema. Desativar bloqueia o acesso na hora."; $("#usersBox").hidden=false; $("#newUserForm").hidden=false; }
+  updHist();
+  try{
+    const d=await api("GET","/bootstrap");
+    BOOT.user=d.user||BOOT.user;
+    state.fields = Array.isArray(d.fields)&&d.fields.length ? d.fields : DEFAULT_FIELDS.slice();
+    state.records = d.students||[];
+    templates = d.templates||[];
+    markSynced();
+    if(!d.fields) last.fields=null;           // primeira vez: grava os campos padrão
+    ui.rec = state.records.length?0:-1;
+    if(d.current){ await openTemplate(d.current); }
+    else {
+      const ex=defaultState();
+      while(pendingUploads.length) await Promise.allSettled(pendingUploads.splice(0));
+      const t=await api("POST","/templates",{name:"Carteirinha estudantil",data:{version:2,orientation:ex.orientation,sides:ex.sides}});
+      templates=[{id:t.id,name:t.name,updated_at:t.updated_at}];
+      await openTemplate(t);
+    }
+    if(!d.fields) save();
+    $("#loading").hidden=true;
+  }catch(err){
+    $("#loading").textContent="Não foi possível carregar: "+err.message+" Recarregue a página.";
+  }
+}
+boot();
+})();
+</script>
+</body>
+</html>
